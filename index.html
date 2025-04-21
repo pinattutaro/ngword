@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>welcome i cource!!</title>
+
+    <style>
+        :root {
+            --main: #0099cc;
+            --sub1: #cc9900;
+        }
+
+        html {
+            overflow-x: hidden;
+        }
+
+        body {
+            background-color: var(--main);
+            width: 100dvw;
+            height: 100dvh;
+            display: grid;
+            place-items: center;
+
+            overflow-x: hidden;
+        }
+
+        .card {
+            background-color: var(--sub1);
+            width: 40dvw;
+            height: 20dvw;
+            font-size: 20px;
+
+            display: grid;
+            place-items: center;
+        }
+
+        #main {
+            width: 90%;
+            height: 90%;
+            /* background-color: rgba(255,255,255,0.9); */
+        }
+
+        .field {
+            width: 100%;
+            display: grid;
+            place-items: center;
+        }
+
+        .field#myself {
+            height: 30dvh;
+        }
+
+        .field#others {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="main">
+        <div id="myself" class="field">
+            <span style="text-align: center;">
+                貴方のNGワード
+                <div class="card">????</div>                
+            </span>
+
+        </div>
+
+        <div id="others" class="field">
+            <span>
+                <div class="card"></div>
+            </span>
+            <span>
+                <div class="card"></div>
+            </span>
+            <span>
+                <div class="card"></div>
+            </span>
+            <span>
+                <div class="card"></div>
+            </span>
+            <span>
+                <div class="card"></div>
+            </span>
+        </div>
+    </div>
+</body>
+</html>
