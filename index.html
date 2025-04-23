@@ -2,17 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
     <title>welcome i cource!!</title>
 
     <style>
         :root {
             --main: #0099cc;
             --sub1: #cc9900;
+            --sub2: #cc0033;
         }
 
-        html {
-            overflow-x: hidden;
+        @media (min-width: 1000px) {
+            .card {
+                width: 30vw !important;
+                height: 10vw !important;
+                font-size: 30px !important;
+            }
+
+            .field#others {
+                gap: 10px;
+            }
         }
 
         body {
@@ -21,8 +30,47 @@
             height: 100dvh;
             display: grid;
             place-items: center;
-
             overflow-x: hidden;
+            margin: 0px;
+        }
+
+        #login {
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0,0,0,0.6);
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            z-index: 999;
+            display: grid;
+            place-items: center;
+
+            & > div {
+                width: 80dvw;
+                height: 50dvh;
+                display: grid;
+                grid-template-rows: repeat(4, 1fr) 0.5fr;
+                font-size: 30px;
+            }
+        }
+
+        #main {
+            /* display: none; */
+            width: 90%;
+            height: 90%;
+            /* opacity: 0.5; */
+            /* background-color: rgba(255,255,255,0.9); */
+
+            & > #reset {
+                width: 15dvw;
+                height: 10dvw;
+                position: absolute;
+                top: 0px;
+                right: 0px;
+                display: grid;
+                place-items: center;
+                place-content: center;
+            }
         }
 
         .card {
@@ -30,62 +78,199 @@
             width: 40dvw;
             height: 20dvw;
             font-size: 20px;
+            text-align: center;
 
             display: grid;
             place-items: center;
-        }
 
-        #main {
-            width: 90%;
-            height: 90%;
-            /* background-color: rgba(255,255,255,0.9); */
+            &.out {
+                background-color: var(--sub2);
+            }
         }
 
         .field {
             width: 100%;
             display: grid;
             place-items: center;
-        }
 
-        .field#myself {
-            height: 30dvh;
-        }
+            &#myself {
+                height: 30dvh;
+                /* margin-bottom: 10dvh; */
+                pointer-events: none;
+            }
 
-        .field#others {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr 1fr;
-            gap: 10px;
+            &#others {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 1fr 1fr 1fr;
+                gap: 30px;                
+            }
         }
     </style>
 </head>
 <body>
+    <div id="login">
+        <div>
+            <input type="text" id="name" placeholder="名前">
+            <input type="number" id="grade" placeholder="学年" min="2" max="4">
+            <input type="number" id="number" placeholder="出席番号" min="1" max="45">
+            <input type="text" id="word" placeholder="NG word">
+            <input type="button" value="login" id="loginBtn">            
+        </div>
+    </div>
+
     <div id="main">
         <div id="myself" class="field">
             <span style="text-align: center;">
                 貴方のNGワード
-                <div class="card">????</div>                
+                <div id="1-1" class="card">????</div>                
             </span>
-
         </div>
 
+        <div id="reset">reset</div>
+
         <div id="others" class="field">
-            <span>
-                <div class="card"></div>
+            <!-- <span>
+                <div id="1-2" class="card"></div>
             </span>
             <span>
-                <div class="card"></div>
+                <div id="1-3" class="card"></div>
             </span>
             <span>
-                <div class="card"></div>
+                <div id="1-4" class="card out"></div>
             </span>
             <span>
-                <div class="card"></div>
+                <div id="1-5" class="card"></div>
             </span>
             <span>
-                <div class="card"></div>
+                <div id="1-6" class="card"></div> -->
             </span>
         </div>
     </div>
 </body>
+<script>
+    const ws = location.href.replace("http","ws").slice(0,-1)
+    const socket = new WebSocket(ws);
+    let myId = null;
+    let started = false;
+
+    socket.addEventListener("close", function (event) {
+        console.log("Connection closed", event);
+        alert("接続が切れました。");
+    });
+
+    socket.addEventListener("message", function (event) {
+        const data = JSON.parse(event.data);
+        console.log(data);
+        const type = data.type;
+
+        switch(type) {
+            case "loginBack":
+                switch(data.result) {
+                    case "ok":
+                        document.getElementById("login").style.display = "none";
+                        // document.getElementById("main").style.display = "block";
+                        myId = data.id;
+                        break;
+                    case "ng":
+                        alert("NGワードが含まれています。");
+                        break;
+                    case "wrong"   :
+                        alert("学年または出席番号が存在していません。");
+                        break;
+                    default:
+                        alert("エラーが発生しました。もう一度お試しください。");
+                }
+                break;
+            case "start":
+                // if (started) return;
+                started = true;
+                const team = data.detail;
+                const members = Object.keys(team);
+                const otherMembers = members.filter(x => x !== myId);
+                const myCard = document.querySelector("#myself .card");
+                myCard.className = "card";
+                myCard.classList.remove("out");
+                myCard.id = myId;
+                // myCard.innerHTML = `${team[myId].ngword}`;
+                myCard.innerHTML = `?????`;
+                myCard.hide = team[myId].ngword;
+                
+                const others = document.getElementById("others");
+                others.innerHTML = ""; // Clear previous cards
+                otherMembers.forEach((m) => {
+                    const elem = document.createElement("span");
+                    const card = document.createElement("div");
+                    card.className = "card";
+                    card.id = m;
+                    card.innerHTML = `${team[m].name}<br>${team[m].ngword}`;
+                    elem.appendChild(card);
+                    others.appendChild(elem);
+                });
+
+                alert("ゲームが開始されました。");
+
+                document.querySelectorAll(".card").forEach(function (card) {
+                    card.addEventListener("click", function () {
+                        const id = this.id;
+
+                        socket.send(JSON.stringify({
+                            type: "cardClick",
+                            id: id
+                        }));
+                    });
+                });
+                break;
+                
+            case "out": 
+                const id = data.id;
+                document.getElementById(id).classList.add("out");
+                if (id == myId) {
+                    alert("あなたは脱落しました。");
+                    const myCard = document.querySelector("#myself .card");
+                    myCard.innerText = myCard.hide;
+                }
+                break;
+            
+            case "reset":
+                alert("リセットされました。");
+                document.getElementById("login").style.display = "grid";
+                document.querySelector("#myself .card").classList.remove("out");
+                document.querySelector("#myself .card").innerText = "????";
+                document.querySelector(".field#others").innerHTML = ""; // Clear previous cards
+                break;
+            default:
+                console.log("Unknown message type:", type);
+        }
+    });
+
+    document.getElementById("loginBtn").addEventListener("click", function () {
+        const name = document.getElementById("name").value.trim();
+        const grade = document.getElementById("grade").value.trim();
+        const number = document.getElementById("number").value.trim();
+        const word = document.getElementById("word").value.trim();
+
+        if (name && grade && number && word) {
+            socket.send(JSON.stringify({
+                type: "login",
+                name: name,
+                id: grade + "-" + number,
+                word: word
+            }));
+        } else {
+            alert("すべてのフィールドに入力してください。");
+        }
+    });
+
+    document.getElementById("reset").addEventListener("click", function () {
+        if(!confirm("本当にリセットしますか？")) return;
+        socket.send(JSON.stringify({
+            type: "reset"
+        }));
+    });
+
+    // socket.addEventListener('open', function (event) {
+    //     console.log("connected");
+    // });
+</script>
 </html>
