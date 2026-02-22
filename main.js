@@ -8,8 +8,8 @@ const WebSocket = require('ws');
 const wss = new WebSocket.Server({ noServer: true });
 const server = http.createServer(app);
 
-const host = "10.133.6.199";
-// const host = "192.168.1.2";
+// const host = "10.133.6.199";
+const host = "localhost";
 
 const port = 1200;
 
@@ -132,5 +132,5 @@ app.get("/", (req, res) => {
 });
 
 server.listen(port, host , () => {
-    console.log(`Server is running on ${host}:${port}`);
+    console.log(`Server is running on http://${host}:${port}`);
 });
